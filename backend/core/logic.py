@@ -5,6 +5,8 @@ from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor
 from phonemizer import phonemize
 import Levenshtein
 import re
+import string
+
 
 class PronunciationTrainer:
     def __init__(self):
@@ -47,6 +49,9 @@ class PronunciationTrainer:
         target_phonemes_per_word = []
         
         for word in words:
+            clean_word = word.strip(string.punctuation)
+    
+            if not clean_word: continue # Skip if the "word" was just "..."
             # Phonemize the single word
             raw_phoneme = phonemize(word, language='en-us', backend='espeak', strip=True)
             clean_phoneme = self.clean_phonemes(raw_phoneme).replace(" ", "")

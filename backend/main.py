@@ -4,7 +4,9 @@ import shutil
 import os
 import random
 import subprocess
-from backend.core.logic import PronunciationTrainer
+
+# --- FIXED IMPORT ---
+from core.logic import PronunciationTrainer
 
 app = FastAPI()
 
@@ -16,7 +18,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-print("🚀 Starting Server & Loading AI Model...")
+print("🚀 Starting Server...")
 trainer = PronunciationTrainer()
 
 SENTENCES = [
@@ -58,12 +60,9 @@ async def analyze_audio(file: UploadFile = File(...), text: str = Form(...)):
             "-y"
         ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
-        # 3. Use the NEW logic flow
-        # We only get user phonemes here. 
-        # The 'compare' function now handles the target phonemes internally.
+        # 3. Use the Logic
+        # NOTE: Make sure your logic.py has .get_user_phonemes() and .compare()
         user_phonemes = trainer.get_user_phonemes(clean_filename)
-        
-        # Pass the RAW TEXT to compare, not phonemes
         score, breakdown = trainer.compare(text, user_phonemes)
 
         return {
